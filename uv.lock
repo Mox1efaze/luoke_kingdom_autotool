@@ -309,15 +309,6 @@ wheels = [
 ]
 
 [[package]]
-name = "interception-python"
-version = "1.13.6"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/76/af/ade2c411c7e4ef42c1320d83eb8f500064f51f272ec2a05c746670b91864/interception_python-1.13.6.tar.gz", hash = "sha256:bf6a9750e40ca8599daa6c05f88748dd7efe040aea7f1aba258d2789a9930eda", size = 22137, upload-time = "2025-07-15T13:47:28.787Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1d/b9/609095f4c70d771dab361e50490941fd5cc735ab88c066ed8a60638115b9/interception_python-1.13.6-py3-none-any.whl", hash = "sha256:c14b0047513a7c1728b55e0516cbfbd99b1315a80e1a5aaf408baf8e9f937b3b", size = 22352, upload-time = "2025-07-15T13:47:27.648Z" },
-]
-
-[[package]]
 name = "jinja2"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
@@ -4033,7 +4024,6 @@ name = "rocopilot"
 version = "2.0.1"
 source = { virtual = "." }
 dependencies = [
-    { name = "interception-python" },
     { name = "keyboard" },
     { name = "mss" },
     { name = "numpy" },
@@ -4054,7 +4044,6 @@ pet = [
 [package.metadata]
 requires-dist = [
     { name = "easyocr", marker = "extra == 'easyocr'" },
-    { name = "interception-python" },
     { name = "keyboard", specifier = ">=0.13.5" },
     { name = "mss", specifier = ">=9.0.1" },
     { name = "numpy", specifier = ">=1.26.4" },

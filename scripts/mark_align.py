@@ -21,9 +21,9 @@ if _BASE not in sys.path:
     sys.path.insert(0, _BASE)
 
 import cv2
-import interception
 import numpy as np
 
+from core.input import _ensure_dd, mouse_down, mouse_up, move_relative
 from core.window import find_window_by_keyword, get_client_rect_on_screen
 
 _WIN_NAME = "Alignment Calibration"
@@ -206,12 +206,12 @@ def calibrate_live(step_h: int, step_v: int) -> tuple[float, float]:
 
     # ---- 复合移动（按住右键拖动视角） ----
     print(f"移动视角: →{step_h}  ↑{step_v} ...")
-    interception.auto_capture_devices()
-    interception.mouse_down('right')
+    _ensure_dd()
+    mouse_down('right')
     time.sleep(0.05)
-    interception.move_relative(step_h, -step_v)
+    move_relative(step_h, -step_v)
     time.sleep(0.5)
-    interception.mouse_up('right')
+    mouse_up('right')
     time.sleep(0.1)
 
     # ---- 截图2 ----

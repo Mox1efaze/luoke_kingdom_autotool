@@ -1,4 +1,4 @@
-"""巡航路径生成 + 移动状态机 + interception 底层控制。"""
+"""巡航路径生成 + 移动状态机 + DD 驱动底层控制。"""
 from __future__ import annotations
 
 import math
@@ -8,11 +8,11 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Optional
 
-import interception
+from core.input import key_down, key_up, mouse_down, mouse_up, move_relative
 
 
 # ── 参数 ─────────────────────────────────────────────────────────────
-MOUSE_DX_PER_DEGREE = 4.0        # interception 鼠标横移 1 像素 ≈ 多少度旋转
+MOUSE_DX_PER_DEGREE = 4.0        # DD 鼠标横移 1 像素 ≈ 多少度旋转
 ARRIVAL_RADIUS = 45.0            # 到达路径点判定距离（地图像素）
 POSITION_TOLERANCE = 50.0        # 位置允许误差
 HEADING_TOLERANCE = 25.0         # 朝向允许误差（度）
@@ -238,9 +238,9 @@ class CruiseController:
             # 每 2 秒完全释放 W 300ms，确保主进程能截到无 W 干扰的战斗 UI
             now = time.perf_counter()
             if self._w_down and now - self._w_last_pulse > W_RELEASE_INTERVAL_S:
-                interception.key_up('w')
+                key_up('w')
                 time.sleep(W_RELEASE_DURATION_S)
-                interception.key_down('w')
+                key_down('w')
                 self._w_last_pulse = now
 
             self._check_stuck_and_handle(cur_x, cur_y)
@@ -267,11 +267,11 @@ class CruiseController:
             # 减速接近目标
             dx = int(math.copysign(abs_dx * 0.8, dx))
 
-        interception.mouse_down('right')
+        mouse_down('right')
         time.sleep(0.02)
-        interception.move_relative(dx, 0)
+        move_relative(dx, 0)
         time.sleep(0.05 + abs_dx * 0.001)
-        interception.mouse_up('right')
+        mouse_up('right')
         time.sleep(0.05)
 
         # 转向后朝向估计已失效，清空历史等待新位移数据
@@ -315,12 +315,12 @@ class CruiseController:
 
     def _start_forward(self):
         if not self._w_down:
-            interception.key_down('w')
+            key_down('w')
             self._w_down = True
 
     def _release_forward(self):
         if self._w_down:
-            interception.key_up('w')
+            key_up('w')
             self._w_down = False
 
     def _release_all(self):

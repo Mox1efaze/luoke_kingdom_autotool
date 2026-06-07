@@ -515,7 +515,7 @@ class CruiseTrackerApp(SiftMapTrackerApp):
         # 注册 F9 全局热键（keyboard 库，Windows 底层钩子）
         self._start_f9_monitor()
 
-        # 悬浮窗设为鼠标穿透，避免 interception 旋转时鼠标点到悬浮窗
+        # 悬浮窗设为鼠标穿透，避免 DD 旋转时鼠标点到悬浮窗
         self._set_window_click_through(True)
 
         from cruise_controller import CruiseController, CruiseArea
@@ -712,8 +712,7 @@ class CruiseTrackerApp(SiftMapTrackerApp):
                          detector) -> None:
         """MLP闭环瞄准（同模式3）：mouse = w1*px + w2*px*|px| + w3*px³。"""
         import json
-        import interception
-        from core.input import _ensure_interception
+        from core.input import _ensure_dd, mouse_down, mouse_up, move_relative
         from core.capture import capture_window_bgr
 
         _auto = os.path.normpath(os.path.join(
@@ -741,8 +740,8 @@ class CruiseTrackerApp(SiftMapTrackerApp):
 
         total_dx, total_dy = 0, 0
 
-        _ensure_interception()
-        interception.mouse_down('right')
+        _ensure_dd()
+        mouse_down('right')
         time.sleep(0.05)
 
         try:
@@ -761,7 +760,7 @@ class CruiseTrackerApp(SiftMapTrackerApp):
                 if abs(dx) < 2 and abs(dy) < 2:
                     break
 
-                interception.move_relative(dx, dy)
+                move_relative(dx, dy)
                 total_dx += dx
                 total_dy += dy
                 time.sleep(settle)
@@ -776,7 +775,7 @@ class CruiseTrackerApp(SiftMapTrackerApp):
 
             pass  # 瞄准完成
         finally:
-            interception.mouse_up('right')
+            mouse_up('right')
             time.sleep(0.10)
 
     def _scan_for_pets(self):
@@ -796,7 +795,7 @@ class CruiseTrackerApp(SiftMapTrackerApp):
 
         try:
             from core.capture import capture_window_bgr
-            from core.input import _ensure_interception, click_at
+            from core.input import _ensure_dd, click_at
         except ImportError as e:
             print(f"[Cruise] 抓宠模块导入失败: {e}")
             return False
@@ -827,17 +826,16 @@ class CruiseTrackerApp(SiftMapTrackerApp):
             self._aim_calibrated(self._game_hwnd, pet_cx, pet_cy, pet_w, pet_h, conf, detector)
         else:
             # 未标定：简单一步到位
-            import interception
-            from core.input import _ensure_interception
-            _ensure_interception()
+            from core.input import _ensure_dd, mouse_down, mouse_up, move_relative
+            _ensure_dd()
             fh, fw = frame.shape[:2]
             dx = int((pet_cx - fw // 2) / ratio_h)
             dy = int((pet_cy - fh // 2) / ratio_v)
-            interception.mouse_down('right')
+            mouse_down('right')
             time.sleep(0.05)
-            interception.move_relative(dx, dy)
+            move_relative(dx, dy)
             time.sleep(0.10)
-            interception.mouse_up('right')
+            mouse_up('right')
             time.sleep(0.10)
 
         # 丢球（同模式3）

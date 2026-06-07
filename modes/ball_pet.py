@@ -8,13 +8,12 @@ import time
 from datetime import datetime
 from typing import Optional
 
-import interception
 import win32con
 import win32gui
 
 from config import CONFIG
 from core.capture import capture_window_bgr
-from core.input import _ensure_interception, click_at, press_once
+from core.input import _ensure_dd, click_at, press_once, mouse_down, mouse_up, move_relative
 from core.vision import best_yes_score_and_loc
 from core.pet_detector import PetDetector
 from core.util import _ts
@@ -312,7 +311,7 @@ class AutoBallPetMode(AutoBallMode):
         注意：精灵可能自行移动导致测不准。推荐使用背景固定物体标定：
             运行 scripts/mark_align.py --capture 进行现场标定，
             结果自动保存到 user_prefs.json，ball_pet 会优先使用。"""
-        _ensure_interception()
+        _ensure_dd()
         step = CONFIG.pet_aim_calib_step
 
         frame = capture_window_bgr(hwnd)
@@ -332,7 +331,7 @@ class AutoBallPetMode(AutoBallMode):
             return 0.0
 
         print(f"[{_ts()}] 灵敏度标定（精灵法，可能不准）：向右移动 {step} 鼠标单位...")
-        interception.move_relative(step, 0)
+        move_relative(step, 0)
         time.sleep(CONFIG.pet_aim_camera_delay * 2)
 
         frame2 = capture_window_bgr(hwnd)
@@ -402,7 +401,7 @@ class AutoBallPetMode(AutoBallMode):
 
     def _aim_fixed(self, hwnd: int, pet_cx: int, pet_cy: int,
                     pet_w: int, pet_h: int, conf: float, detector: PetDetector) -> None:
-        _ensure_interception()
+        _ensure_dd()
         screen_w, screen_h = self._screen_size(hwnd)
         center_x = screen_w // 2
         center_y = screen_h // 2
@@ -418,7 +417,7 @@ class AutoBallPetMode(AutoBallMode):
             f"[{_ts()}] 精灵定位: pos=({pet_cx},{pet_cy}) size=({pet_w}x{pet_h}) conf={conf:.2f}"
         )
 
-        interception.mouse_down('right')
+        mouse_down('right')
         time.sleep(0.05)
 
         try:
@@ -442,7 +441,7 @@ class AutoBallPetMode(AutoBallMode):
                     dx = step if h_error > thresh else (-step if h_error < -thresh else 0)
                     dy = step if v_error > thresh else (-step if v_error < -thresh else 0)
 
-                interception.move_relative(dx, dy)
+                move_relative(dx, dy)
                 total_dx += dx
                 total_dy += dy
                 time.sleep(settle)
@@ -460,7 +459,7 @@ class AutoBallPetMode(AutoBallMode):
             final_v_err = pet_cy - center_y
             print(f"  最终误差: h_err={int(final_h_err):+d}px v_err={int(final_v_err):+d}px (steps={iterations})")
         finally:
-            interception.mouse_up('right')
+            mouse_up('right')
             time.sleep(0.10)
 
         self._log_calib(screen_w, screen_h, orig_pet_cx, orig_pet_cy,
@@ -480,12 +479,12 @@ class AutoBallPetMode(AutoBallMode):
         base_units = screen_w * 0.6 / self._sensitivity_ratio_h
         rotate_units = int(base_units * random.uniform(0.85, 1.15))
 
-        _ensure_interception()
-        interception.mouse_down('right')
+        _ensure_dd()
+        mouse_down('right')
         time.sleep(0.05)
-        interception.move_relative(rotate_units, 0)
+        move_relative(rotate_units, 0)
         time.sleep(0.3)
-        interception.mouse_up('right')
+        mouse_up('right')
         time.sleep(0.10)
         print(f"[{_ts()}] 视角旋转 90° (→{rotate_units}u)")
 
@@ -507,8 +506,8 @@ class AutoBallPetMode(AutoBallMode):
 
         total_dx, total_dy = 0, 0
 
-        _ensure_interception()
-        interception.mouse_down('right')
+        _ensure_dd()
+        mouse_down('right')
         time.sleep(0.05)
 
         try:
@@ -528,7 +527,7 @@ class AutoBallPetMode(AutoBallMode):
                 if abs(dx) < 2 and abs(dy) < 2:
                     break
 
-                interception.move_relative(dx, dy)
+                move_relative(dx, dy)
                 total_dx += dx
                 total_dy += dy
                 time.sleep(settle * random.uniform(0.85, 1.15))
@@ -544,7 +543,7 @@ class AutoBallPetMode(AutoBallMode):
             print(f"  MLP: h_err={int(pet_cx - cx):+d}px v_err={int(pet_cy - cy):+d}px "
                   f"(w_h=[{nn_w[0]:.4f},{nn_w[1]:.6f},{nn_w[2]:.8f}])")
         finally:
-            interception.mouse_up('right')
+            mouse_up('right')
             time.sleep(0.10)
 
         self._log_calib(screen_w, screen_h, pet_cx, pet_cy,
@@ -570,12 +569,12 @@ class AutoBallPetMode(AutoBallMode):
             f"鼠标位移=({dx},{dy}) [ratio_h={ratio_h:.3f} ratio_v={ratio_v:.3f}]"
         )
 
-        _ensure_interception()
-        interception.mouse_down('right')
+        _ensure_dd()
+        mouse_down('right')
         time.sleep(0.05)
-        interception.move_relative(dx, dy)
+        move_relative(dx, dy)
         time.sleep(CONFIG.pet_aim_camera_delay)
-        interception.mouse_up('right')
+        mouse_up('right')
         time.sleep(0.10)
 
         self._log_calib(screen_w, screen_h, pet_cx, pet_cy,
