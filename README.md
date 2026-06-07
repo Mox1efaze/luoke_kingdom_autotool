@@ -6,12 +6,10 @@
 
 仿照原作者<https://github.com/Makapic/RocoPilot>
 
-因为interception驱动不好安装，这里给出dd驱动的解决方案
+因为interception驱动不好安装，这里给出dd驱动的解决方案,其他方案可以直接参考原作者
 
 1. 解压 `RocoPilot.zip` 到任意目录
 2. **以管理员身份**运行 `RocoPilot.exe`
-
-> 首次启动模式 3 需生成 SIFT 锚点缓存（约 2-3 分钟），后续启动秒加载。
 
 ***
 
@@ -19,19 +17,6 @@
 
 > 以下为实测可用的环境配置。其他相近版本（如 Windows 10、Python 3.11、CUDA 11.8）通常也能正常运行。
 
-| 项目     | 实测配置                   | 说明                                       |
-| ------ | ---------------------- | ---------------------------------------- |
-| 操作系统   | Windows 11 Pro 64-bit  | Windows 10 亦可；依赖 pywin32，不支持 macOS/Linux |
-| 权限     | **管理员权限**              | Interception 驱动加载、截图 API 需要              |
-| Python | 3.12.9（由 uv 管理）        | 要求 3.11+，uv 自动下载，无需手动安装                  |
-| uv     | 0.11.11                | 包管理器和 Python 版本管理器                       |
-| GPU    | NVIDIA RTX 3060 Laptop | 驱动 581.95，CUDA 12.1；精灵检测和 OCR 需要         |
-| 显存     | 6 GB                   | YOLO 模型约消耗 1-2 GB，巡航子进程额外占用              |
-| 游戏分辨率  | 1920×1080              | 模板在该分辨率下截图，其他分辨率可自适应缩放                   |
-
-环境安装教程
-
-以下步骤在 **Windows 11 管理员终端** 下操作，其他版本大同小异。
 
 ### 1. 安装dd 驱动
 
@@ -64,7 +49,7 @@ uv --version
 
 ```powershell
 # 克隆到本地
-git clone https://github.com/Makapic/RocoPilot.git
+git clone https://github.com/Mox1efaze/luoke_kingdom_autotool.git
 cd RocoPilot
 ```
 
